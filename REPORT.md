@@ -4,86 +4,132 @@ Paste your checkpoint evidence below. Add screenshots as image files in the repo
 
 ## Task 1A — Bare agent
 
-### Question 1: "What is the agentic loop?"
+**Command:** `uv run nanobot agent --session cli:report-1a-loop -c ./config.json -m "What is the agentic loop?"`
 
-The agentic loop is the fundamental cycle that autonomous AI agents follow to accomplish tasks. It's the
-core reasoning and action pattern that enables agents to work independently toward goals.
+**Agent response:**
+```
+🐈 nanobot
+The agentic loop is the fundamental cycle that an AI agent follows to accomplish tasks. It typically
+consists of these core stages:
 
-The Basic Loop: Perceive → Reason → Act → Observe → (repeat)
+ 1 Perceive — Gather information from the environment (user input, tool outputs, file contents, API
+   responses, etc.)
+ 2 Reason — Process the information, plan next steps, and decide what action to take
+ 3 Act — Execute actions using available tools (read/write files, run commands, call APIs, send messages,
+   etc.)
+ 4 Observe — Receive feedback from the action's result (success, error, output data)
+ 5 Repeat — Continue the loop until the task is complete or a stopping condition is met
 
-1. **Perceive**: The agent gathers information about its environment (user input, tool outputs, file contents, API responses, system state)
-2. **Reason**: The agent processes information and decides what to do (analyze current state, plan next steps, evaluate options, consider constraints)
-3. **Act**: The agent executes actions (call tools, make API requests, send messages, modify state)
-4. **Observe**: The agent observes the results of its actions (tool outputs, success/failure signals, new information, environment changes)
+ ┌─────────────┐
+ │   Perceive  │
+ └──────┬──────┘
+        ↓
+ ┌─────────────┐
+ │   Reason    │
+ └──────┬──────┘
+        ↓
+ ┌─────────────┐
+ │    Act      │
+ └──────┬──────┘
+        ↓
+ ┌─────────────┐
+ │   Observe   │
+ └──────┬──────┘
+        ↓
+    (repeat)
 
-Then the loop repeats until the goal is achieved or the agent determines it cannot proceed.
+This loop enables agents to:
 
-This loop is what distinguishes agents from simple chatbots — agents can take actions, observe results, and iterate toward goals.
+ • Handle multi-step tasks autonomously
+ • Adapt based on feedback
+ • Recover from errors
+ • Break complex goals into manageable steps
 
-### Question 2: "What labs are available in our LMS?"
+In my case, each time you give me a request, I go through this loop: I read the context, decide which
+tools to use, execute them, observe the results, and continue until I can provide you with a complete
+answer.
+```
 
-The agent explored the workspace using file system tools and found:
+---
 
-**Lab 8 — The Agent is the Interface**
+**Command:** `uv run nanobot agent --session cli:report-1a-labs -c ./config.json -m "What labs are available in our LMS?"`
 
-This is the current lab focusing on building an AI agent (nanobot) as a natural-language interface to the LMS system.
+**Agent response:**
+```
+🐈 nanobot
+Here are the available labs in the LMS:
 
-**Required Tasks:**
-1. Task 1: Set Up the Agent — install nanobot, configure Qwen API, add MCP tools, write skill prompt
-2. Task 2: Deploy and Connect a Web Client — Dockerize nanobot, add WebSocket channel + Flutter chat UI
-3. Task 3: Give the Agent New Eyes — explore observability data, write log/trace MCP tools
-4. Task 4: Diagnose a Failure and Make the Agent Proactive — investigate a failure, schedule in-chat health checks, fix a planted bug
+ 1 Lab 01 – Products, Architecture & Roles
+ 2 Lab 02 — Run, Fix, and Deploy a Backend Service
+ 3 Lab 03 — Backend API: Explore, Debug, Implement, Deploy
+ 4 Lab 04 — Testing, Front-end, and AI Agents
+ 5 Lab 05 — Data Pipeline and Analytics Dashboard
+ 6 Lab 06 — Build Your Own Agent
+ 7 Lab 07 — Build a Client with an AI Coding Agent
+ 8 lab-08
 
-**Optional Tasks:**
-1. Task 1: Add a Telegram Bot Client — same agent, different interface
+Is there a specific lab you'd like to explore further? I can help you get pass rates, completion rates,
+timelines, group performance, or top learners for any of these labs.
+```
 
-**Note:** The agent inspected local repo files but could not query real LMS backend data yet (no MCP tools configured at this stage).
+**Note:** This response came from the agent exploring local workspace files, not from live LMS backend data (MCP tools not yet configured).
 
 ## Task 1B — Agent with LMS tools
 
-### Question 1: "What labs are available?"
+**Command:** `uv run nanobot agent --session cli:report-1b-labs -c ./config.json -m "What labs are available?"`
 
-The agent successfully called the MCP tool `mcp_lms_lms_labs` and returned real lab data from the backend:
+**Agent response:**
+```
+🐈 nanobot
+Here are the available labs in the LMS:
 
-**Available labs:**
-1. Lab 01 – Products, Architecture & Roles
-2. Lab 02 — Run, Fix, and Deploy a Backend Service
-3. Lab 03 — Backend API: Explore, Debug, Implement, Deploy
-4. Lab 04 — Testing, Front-end, and AI Agents
-5. Lab 05 — Data Pipeline and Analytics Dashboard
-6. Lab 06 — Build Your Own Agent
-7. Lab 07 — Build a Client with an AI Coding Agent
-8. lab-08
+ 1 Lab 01 – Products, Architecture & Roles
+ 2 Lab 02 — Run, Fix, and Deploy a Backend Service
+ 3 Lab 03 — Backend API: Explore, Debug, Implement, Deploy
+ 4 Lab 04 — Testing, Front-end, and AI Agents
+ 5 Lab 05 — Data Pipeline and Analytics Dashboard
+ 6 Lab 06 — Build Your Own Agent
+ 7 Lab 07 — Build a Client with an AI Coding Agent
+ 8 lab-08
 
-### Question 2: "Is the LMS backend healthy?"
+Let me know if you'd like details about any specific lab (scores, pass rates, timeline, groups, top
+learners, or completion rate)!
+```
 
-The agent called the `mcp_lms_lms_health` tool and responded:
+---
 
-**Response:** "Yes, the LMS backend is healthy. It currently has 56 items in the system."
+**Command:** `uv run nanobot agent --session cli:report-1b-health -c ./config.json -m "Is the LMS backend healthy?"`
 
-**MCP Tools Registered:**
-- `mcp_lms_lms_health` - Check backend health
-- `mcp_lms_lms_labs` - List available labs
-- `mcp_lms_lms_learners` - Get learners data
-- `mcp_lms_lms_pass_rates` - Get pass rates
-- `mcp_lms_lms_timeline` - Get timeline data
-- `mcp_lms_lms_groups` - Get groups data
-- `mcp_lms_lms_top_learners` - Get top learners
-- `mcp_lms_lms_completion_rate` - Get completion rate
-- `mcp_lms_lms_sync_pipeline` - Trigger sync pipeline
+**Agent response:**
+```
+🐈 nanobot
+I'll check the LMS backend health for you.
+
+🐈 nanobot
+Yes, the LMS backend is healthy! It's currently tracking 56 items.
+```
+
+**MCP tools registered:**
+- `mcp_lms_lms_health` — Check backend health and item count
+- `mcp_lms_lms_labs` — List all available labs
+- `mcp_lms_lms_learners` — List all learners
+- `mcp_lms_lms_pass_rates` — Get pass rates for a lab
+- `mcp_lms_lms_timeline` — Get submission timeline for a lab
+- `mcp_lms_lms_groups` — Get group performance for a lab
+- `mcp_lms_lms_top_learners` — Get top learners for a lab
+- `mcp_lms_lms_completion_rate` — Get completion rate for a lab
+- `mcp_lms_lms_sync_pipeline` — Trigger the sync pipeline
 
 ## Task 1C — Skill prompt
 
-### Question: "Show me the scores" (without specifying a lab)
+**Command:** `uv run nanobot agent --session cli:report-1c-scores -c ./config.json -m "Show me the scores"`
 
-The agent followed the LMS skill strategy:
-
-1. Recognized that "scores" requires a lab parameter
-2. Called `lms_labs` first to get available labs
-3. Listed all 8 available labs and asked the user to choose one
-
-**Response:**
+**Agent response:**
 ```
+🐈 nanobot
+I'll check what labs are available in the LMS so you can choose which one to see scores for.
+
+🐈 nanobot
 Here are the available labs:
 
  1 Lab 01 – Products, Architecture & Roles
@@ -98,15 +144,13 @@ Here are the available labs:
 Which lab would you like to see the scores for?
 ```
 
-**Skill file created:** `nanobot/workspace/skills/lms/SKILL.md`
+**Skill file:** `nanobot/workspace/skills/lms/SKILL.md`
 
-The skill teaches the agent:
-- Which `lms_*` tools are available and when to use each one
-- When a lab parameter is needed but not provided, call `lms_labs` first and ask the user to choose
+The skill teaches the agent to:
+- Call `lms_labs` first when a lab parameter is needed but not provided
+- Ask the user to choose a lab before querying scores, pass rates, etc.
 - Use each lab's title as the user-facing label
-- Format numeric results nicely (percentages, counts)
-- Keep responses concise
-- When the user asks "what can you do?", explain its current tools and limits clearly
+- Format numeric results nicely and keep responses concise
 
 ## Task 2A — Deployed agent
 
