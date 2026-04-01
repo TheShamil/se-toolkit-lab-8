@@ -25,6 +25,7 @@ COPY . /app/nanobot
 
 # Copy mcp and nanobot-websocket-channel projects from workspace using additional_contexts
 COPY --from=workspace mcp/mcp-lms /app/mcp/mcp-lms
+COPY --from=workspace mcp/mcp-obs /app/mcp/mcp-obs
 COPY --from=workspace nanobot-websocket-channel/nanobot-webchat /app/nanobot-websocket-channel/nanobot-webchat
 COPY --from=workspace nanobot-websocket-channel/mcp-webchat /app/nanobot-websocket-channel/mcp-webchat
 COPY --from=workspace nanobot-websocket-channel/nanobot-channel-protocol /app/nanobot-websocket-channel/nanobot-channel-protocol

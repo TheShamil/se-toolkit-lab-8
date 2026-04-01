@@ -223,15 +223,99 @@ Everything is running smoothly! Is there anything specific you'd like to check i
 
 ## Task 3A — Structured logging
 
-<!-- Paste happy-path and error-path log excerpts, VictoriaLogs query screenshot -->
+**Happy-path log excerpt (request_started → request_completed with status 200):**
+
+```
+2026-04-01 18:02:00,559 INFO [lms_backend.main] [main.py:62] [trace_id=c5f348ea52230f344c4ac5a9637b7786 span_id=8db4bc8791aa089d resource.service.name=Learning Management Service trace_sampled=True] - request_started
+2026-04-01 18:02:00,675 INFO [lms_backend.auth] [auth.py:30] [trace_id=c5f348ea52230f344c4ac5a9637b7786 span_id=8db4bc8791aa089d resource.service.name=Learning Management Service trace_sampled=True] - auth_success
+2026-04-01 18:02:00,703 INFO [lms_backend.db.items] [items.py:16] [trace_id=c5f348ea52230f344c4ac5a9637b7786 span_id=8db4bc8791aa089d resource.service.name=Learning Management Service trace_sampled=True] - db_query
+2026-04-01 18:02:01,034 INFO [lms_backend.main] [main.py:74] [trace_id=c5f348ea52230f344c4ac5a9637b7786 span_id=8db4bc8791aa089d resource.service.name=Learning Management Service trace_sampled=True] - request_completed
+INFO:     172.18.0.10:53006 - "GET /items/ HTTP/1.1" 200 OK
+```
+
+**Error-path log excerpt (db_query with error):**
+
+```
+2026-04-01 18:24:38,760 INFO [lms_backend.db.items] [items.py:16] [trace_id=f91814ffc06110eec392a4219406f539 span_id=e668ec7eede2423c resource.service.name=Learning Management Service trace_sampled=True] - db_query
+2026-04-01 18:24:38,871 ERROR [lms_backend.db.items] [items.py:23] [trace_id=f91814ffc06110eec392a4219406f539 span_id=e668ec7eede2423c resource.service.name=Learning Management Service trace_sampled=True] - db_query
+2026-04-01 18:24:38,874 WARNING [lms_backend.routers.items] [items.py:23] [trace_id=f91814ffc06110eec392a4219406f539 span_id=e668ec7eede2423c resource.service.name=Learning Management Service trace_sampled=True] - items_list_failed_as_not_found
+```
+
+**VictoriaLogs query result:**
+
+Query: `_time:1h service.name:"Learning Management Service" severity:ERROR`
+
+Result:
+```json
+{
+  "_msg": "db_query",
+  "error": "(sqlalchemy.dialects.postgresql.asyncpg.InterfaceError) <class 'asyncpg.exceptions._base.InterfaceError'>: connection is closed",
+  "event": "db_query",
+  "severity": "ERROR",
+  "service.name": "Learning Management Service",
+  "trace_id": "f91814ffc06110eec392a4219406f539"
+}
+```
 
 ## Task 3B — Traces
 
-<!-- Screenshots: healthy trace span hierarchy, error trace -->
+**Healthy trace:** Shows request flow through auth → db_query → response with 200 status.
+
+**Error trace:** Shows the same flow but with db_query failing due to "connection is closed" error, resulting in 404 response.
+
+*(Note: Screenshots would be added here from the VictoriaTraces UI at http://<vm-ip>:42002/utils/victoriatraces)*
 
 ## Task 3C — Observability MCP tools
 
-<!-- Paste agent responses to "any errors in the last hour?" under normal and failure conditions -->
+**Files created:**
+- `mcp/mcp-obs/src/mcp_obs/` — MCP server with observability tools
+- `mcp/mcp-obs/src/mcp_obs/client.py` — HTTP client for VictoriaLogs and VictoriaTraces
+- `mcp/mcp-obs/src/mcp_obs/tools.py` — Tool definitions (logs_search, logs_error_count, traces_list, traces_get)
+- `mcp/mcp-obs/src/mcp_obs/server.py` — MCP server implementation
+- `nanobot/workspace/skills/observability/SKILL.md` — Observability skill prompt
+
+**MCP tools registered:**
+- `mcp_obs_logs_search` — Search logs using LogsQL
+- `mcp_obs_logs_error_count` — Count errors per service
+- `mcp_obs_traces_list` — List recent traces
+- `mcp_obs_traces_get` — Fetch specific trace by ID
+
+---
+
+**Agent response under normal conditions:**
+
+**Q:** "Any LMS backend errors in the last 10 minutes?"
+
+**A:** "No errors found in the Learning Management Service over the last 10 minutes. The backend appears to be running smoothly."
+
+---
+
+**Agent response under failure conditions (PostgreSQL stopped):**
+
+**Q:** "Any LMS backend errors in the last 10 minutes?"
+
+**A:** 
+```
+## Backend Status: ⚠️ Unhealthy
+
+**Root Cause:** Database connection issue
+
+The LMS backend is experiencing a **PostgreSQL connection failure**. The error shows:
+- `asyncpg.exceptions._base.InterfaceError: connection is closed`
+- The database connection to `db-lab-8` on `postgres:5432` was closed during a query
+- This caused the health check endpoint to return **HTTP 404**
+
+**Timeline:**
+- Error occurred at **18:24:38 UTC** (about 15 minutes ago)
+- 1 error recorded in the last hour
+
+**Impact:**
+- The backend cannot query the database
+- Health checks are failing
+- API requests to `/items/` are returning 404 errors
+
+The database connection pool may need to be restarted or the PostgreSQL service should be checked.
+```
 
 ## Task 4A — Multi-step investigation
 
