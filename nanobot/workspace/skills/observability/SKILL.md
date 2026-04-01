@@ -17,6 +17,28 @@ Use observability MCP tools to investigate system health, errors, and failures.
 
 ## Strategy
 
+### When the user asks "What went wrong?" or "Check system health":
+
+1. **Start with `logs_error_count`** to see if there are recent errors
+   - Use a narrow time window like "10m" for recent issues
+   - Focus on the LMS backend service: "Learning Management Service"
+
+2. **Use `logs_search`** to inspect error details
+   - Query: `_time:10m service.name:"Learning Management Service" severity:ERROR`
+   - Look for the `trace_id` field in error logs
+   - Note the error message and exception type
+
+3. **If you find a trace_id, use `traces_get`** to inspect the full trace
+   - This shows the complete request flow and where it failed
+   - Identify which span failed and what operation was being performed
+
+4. **Summarize findings as one coherent investigation**
+   - Don't dump raw JSON
+   - Explain what went wrong in plain language
+   - Cite both log evidence AND trace evidence
+   - Mention the affected service, root failing operation, and error type
+   - Note any discrepancy between what logs show vs what HTTP response was returned
+
 ### When the user asks about errors or system health:
 
 1. **Start with `logs_error_count`** to see if there are recent errors
