@@ -91,6 +91,23 @@ def main():
         if os.environ.get("NANOBOT_VICTORIATRACES_URL"):
             config["tools"]["mcpServers"]["webchat"]["env"]["NANOBOT_VICTORIATRACES_URL"] = os.environ["NANOBOT_VICTORIATRACES_URL"]
 
+    # Observability MCP server (mcp-obs)
+    if os.environ.get("NANOBOT_VICTORIALOGS_URL") or os.environ.get("NANOBOT_VICTORIATRACES_URL"):
+        if "obs" not in config["tools"]["mcpServers"]:
+            config["tools"]["mcpServers"]["obs"] = {
+                "command": venv_python,
+                "args": ["-m", "mcp_obs"],
+                "env": {}
+            }
+        else:
+            config["tools"]["mcpServers"]["obs"]["command"] = venv_python
+        if "env" not in config["tools"]["mcpServers"]["obs"]:
+            config["tools"]["mcpServers"]["obs"]["env"] = {}
+        if os.environ.get("NANOBOT_VICTORIALOGS_URL"):
+            config["tools"]["mcpServers"]["obs"]["env"]["NANOBOT_VICTORIALOGS_URL"] = os.environ["NANOBOT_VICTORIALOGS_URL"]
+        if os.environ.get("NANOBOT_VICTORIATRACES_URL"):
+            config["tools"]["mcpServers"]["obs"]["env"]["NANOBOT_VICTORIATRACES_URL"] = os.environ["NANOBOT_VICTORIATRACES_URL"]
+
     # Write resolved config
     with open(resolved_path, "w") as f:
         json.dump(config, f, indent=2)
