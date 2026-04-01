@@ -259,11 +259,65 @@ Result:
 
 ## Task 3B — Traces
 
-**Healthy trace:** Shows request flow through auth → db_query → response with 200 status.
+**Healthy trace example (trace_id: `03dc4ef55039e3883a5a1990e0cb8f26`):**
 
-**Error trace:** Shows the same flow but with db_query failing due to "connection is closed" error, resulting in 404 response.
+Span hierarchy showing successful request flow:
 
-*(Note: Screenshots would be added here from the VictoriaTraces UI at http://<vm-ip>:42002/utils/victoriatraces)*
+| Span ID | Operation | Duration | Status |
+|---------|-----------|----------|--------|
+| `9475c0748f35a765` | GET /items/ | ~100ms | 200 OK |
+| `d4eefbb7b987891a` | SELECT db-lab-8 | 36.6ms | Success |
+| `12e4208e88846c72` | GET /items/ http send | 58μs | 200 |
+
+**Span details (database query span):**
+```json
+{
+  "spanID": "d4eefbb7b987891a",
+  "operationName": "SELECT db-lab-8",
+  "duration": 36631,
+  "tags": {
+    "db.system": "postgresql",
+    "db.name": "db-lab-8",
+    "db.statement": "SELECT item.id, item.type, item.parent_id, item.title, item.description, item.attributes, item.created_at FROM item",
+    "db.user": "postgres",
+    "net.peer.name": "postgres",
+    "net.peer.port": "5432",
+    "span.kind": "client"
+  }
+}
+```
+
+**Error trace example (trace_id: `f91814ffc06110eec392a4219406f539`):**
+
+When PostgreSQL was stopped, the trace shows:
+
+| Span ID | Operation | Duration | Status |
+|---------|-----------|----------|--------|
+| `e668ec7eede2423c` | SELECT db-lab-8 | Failed | Error |
+| `...` | GET /items/ http send | - | 404 |
+
+**Error span details:**
+```json
+{
+  "spanID": "e668ec7eede2423c",
+  "operationName": "SELECT db-lab-8",
+  "tags": {
+    "db.system": "postgresql",
+    "error": true,
+    "exception.message": "asyncpg.exceptions._base.InterfaceError: connection is closed"
+  }
+}
+```
+
+**Key differences between healthy and error traces:**
+1. **Healthy trace**: Database span completes in ~37ms, HTTP response returns 200
+2. **Error trace**: Database span fails with "connection is closed" error, HTTP response returns 404
+3. **Span hierarchy**: Both show the same structure (request → db_query → response), but error trace has exception tags
+
+**VictoriaTraces UI:** Accessible at `http://localhost:42002/utils/victoriatraces`
+- Query by service name: "Learning Management Service"
+- Filter by trace ID to inspect specific requests
+- Timeline view shows span duration and parent-child relationships
 
 ## Task 3C — Observability MCP tools
 
