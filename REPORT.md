@@ -154,11 +154,72 @@ The skill teaches the agent to:
 
 ## Task 2A — Deployed agent
 
-<!-- Paste a short nanobot startup log excerpt showing the gateway started inside Docker -->
+**Nanobot gateway startup logs:**
+
+```
+🐈 Starting nanobot gateway version 0.1.4.post5 on port 18790...
+✓ Channels enabled: webchat
+✓ Heartbeat: every 1800s
+2026-04-01 17:47:24.748 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_health' from server 'lms'
+2026-04-01 17:47:24.749 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_labs' from server 'lms'
+2026-04-01 17:47:24.750 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_learners' from server 'lms'
+2026-04-01 17:47:24.750 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_pass_rates' from server 'lms'
+2026-04-01 17:47:24.750 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_timeline' from server 'lms'
+2026-04-01 17:47:24.750 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_groups' from server 'lms'
+2026-04-01 17:47:24.750 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_top_learners' from server 'lms'
+2026-04-01 17:47:24.750 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_completion_rate' from server 'lms'
+2026-04-01 17:47:24.751 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_lms_lms_sync_pipeline' from server 'lms'
+2026-04-01 17:47:24.751 | INFO  | nanobot.agent.tools.mcp:connect_mcp_servers:246 - MCP server 'lms': connected, 9 tools registered
+2026-04-01 17:47:27.543 | DEBUG | nanobot.agent.tools.mcp:connect_mcp_servers:226 - MCP: registered tool 'mcp_webchat_ui_message' from server 'webchat'
+2026-04-01 17:47:27.543 | INFO  | nanobot.agent.tools.mcp:connect_mcp_servers:246 - MCP server 'webchat': connected, 1 tools registered
+2026-04-01 17:47:27.543 | INFO  | nanobot.agent.loop:run:280 - Agent loop started
+```
+
+**Files created/modified:**
+- `nanobot/entrypoint.py` — resolves environment variables into config and launches nanobot gateway
+- `nanobot/Dockerfile` — multi-stage build with uv for nanobot and MCP dependencies
+- `docker-compose.yml` — nanobot service with correct volumes and environment variables
+- `caddy/Caddyfile` — added `/ws/chat` route for WebSocket connections
 
 ## Task 2B — Web client
 
-<!-- Screenshot of a conversation with the agent in the Flutter web app -->
+**Flutter web client accessible at:** `http://localhost:42002/flutter/`
+
+**WebSocket endpoint test:**
+
+```
+Q1: What can you do?
+I'm nanobot 🐈, your personal AI assistant. Here's what I can do in this system:
+
+## Core Capabilities
+
+**File & System Operations**
+- Read, write, and edit files
+- List directory contents
+- Execute shell commands (with safety limits)
+- Search the web and fetch web content
+
+**LMS Integration**
+- Query lab information, pass rates, and completion rates
+- View submission timelines and group performance
+- Get top learners and learner lists
+- Check backend health and trigger sync pipelines
+
+Q2: How is the backend doing?
+The LMS backend is **healthy** ✅
+
+- **Status**: Healthy
+- **Item Count**: 56 items
+
+Everything is running smoothly! Is there anything specific you'd like to check in the LMS?
+```
+
+**Files created/modified:**
+- `nanobot-websocket-channel/` — Git submodule with WebSocket channel plugin and Flutter client
+- `nanobot/config.json` — webchat channel enabled
+- `nanobot/entrypoint.py` — webchat MCP server configuration
+- `docker-compose.yml` — client-web-flutter service and caddy updates
+- `caddy/Caddyfile` — `/flutter` route and `/ws/chat` WebSocket proxy
 
 ## Task 3A — Structured logging
 
